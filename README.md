@@ -1,8 +1,11 @@
-# Arduino LoRa
+# Mbed LoRa
 
 [![Build Status](https://travis-ci.org/sandeepmistry/arduino-LoRa.svg?branch=master)](https://travis-ci.org/sandeepmistry/arduino-LoRa)
 
-An [Arduino](https://arduino.cc/) library for sending and receiving data using [LoRa](https://www.lora-alliance.org/) radios.
+An [Mbed](https://www.mbed.com/) library for sending and receiving data using [LoRa](https://www.lora-alliance.org/) radios.
+
+# Port notes
+Library was tested on SX1278 module. The main difference is that now you have to create the `LoRaClass` object yourself. I removed the MKR WAN shield code. Also I am not sure what will happen if the DIO0 interrupt happend during SPI operation since the Lora library will try to lock the bus. It might wait for the bus to become free but I do not know exactly how mbed handles SPI.
 
 ## Compatible Hardware
 
@@ -10,10 +13,7 @@ An [Arduino](https://arduino.cc/) library for sending and receiving data using [
    * [Dragino Lora Shield](http://www.dragino.com/products/module/item/102-lora-shield.html)
    * [HopeRF](http://www.hoperf.com/rf_transceiver/lora/) [RFM95W](http://www.hoperf.com/rf_transceiver/lora/RFM95W.html), [RFM96W](http://www.hoperf.com/rf_transceiver/lora/RFM96W.html), and [RFM98W](http://www.hoperf.com/rf_transceiver/lora/RFM98W.html)
    * [Modtronix](http://modtronix.com/) [inAir4](http://modtronix.com/inair4.html), [inAir9](http://modtronix.com/inair9.html), and [inAir9B](http://modtronix.com/inair9b.html)
- * [Arduino MKR WAN 1300](https://store.arduino.cc/usa/mkr-wan-1300)
-   * **NOTE:** Requires firmware v1.1.6 or later on the on-board Murata module. Please use the [MKRWANFWUpdate_standalone example](https://github.com/arduino-libraries/MKRWAN/blob/master/examples/MKRWANFWUpdate_standalone/MKRWANFWUpdate_standalone.ino) from latest [MKRWAN library](https://github.com/arduino-libraries/MKRWAN) release to update the firmware.
-   * **WARNING**: [LoRa.onReceive(...)](https://github.com/sandeepmistry/arduino-LoRa/blob/master/API.md#register-callback) and [LoRa.recieve()](https://github.com/sandeepmistry/arduino-LoRa/blob/master/API.md#receive-mode) is not compatible with this board!
-
+ 
 ### Semtech SX1276/77/78/79 wiring
 
 | Semtech SX1276/77/78/79 | Arduino |
@@ -27,27 +27,17 @@ An [Arduino](https://arduino.cc/) library for sending and receiving data using [
 | NRESET | 9 |
 | DIO0 | 2 |
 
-
-`NSS`, `NRESET`, and `DIO0` pins can be changed by using `LoRa.setPins(ss, reset, dio0)`. `DIO0` pin is optional, it is only needed for receive callback mode. If `DIO0` pin is used, it **must** be interrupt capable via [`attachInterrupt(...)`](https://www.arduino.cc/en/Reference/AttachInterrupt).
-
 **NOTES**:
  * Some boards (like the Arduino Nano), cannot supply enough current for the SX127x in TX mode. This will cause lockups when sending, be sure to use an external 3.3V supply that can provide at least 120mA's when using these boards.
  * If your Arduino board operates at 5V, like the Arduino Uno, Leonardo or Mega, you will need to use a level converter for the wiring to the Semtech SX127x module. Most Semtech SX127x breakout boards do not have logic level converters built-in.
 
 ## Installation
 
-### Using the Arduino IDE Library Manager
-
-1. Choose `Sketch` -> `Include Library` -> `Manage Libraries...`
-2. Type `LoRa` into the search box.
-3. Click the row to select the library.
-4. Click the `Install` button to install the library.
-
 ### Using Git
 
 ```sh
-cd ~/Documents/Arduino/libraries/
-git clone https://github.com/sandeepmistry/arduino-LoRa LoRa
+cd /path/to/mbed/project/
+git clone https://github.com/Carbon225/mbed-lora
 ```
 
 ## API
@@ -56,13 +46,13 @@ See [API.md](API.md).
 
 ## Examples
 
-See [examples](examples) folder.
+See [examples](examples) folder (outdated).
 
 ## FAQ
 
 **1) Initilizating the LoRa radio is failing**
 
-Please check the wiring you are using matches what's listed in [Semtech SX1276/77/78/79 wiring](#semtech-sx1276777879-wiring). You can also use `LoRa.setPins(ss, reset, dio0)` to change the default pins used. Some logic level converters cannot operate at 8 MHz, you can call `LoRa.setSPIFrequency(frequency)` to lower the SPI frequency used by the library. Both API's must be called before `LoRa.begin(...)`.
+Please check the wiring you are using matches what's listed in [Semtech SX1276/77/78/79 wiring](#semtech-sx1276777879-wiring). Some logic level converters cannot operate at 8 MHz, you can call `LoRa.setSPIFrequency(frequency)` to lower the SPI frequency used by the library. Both API's must be called before `LoRa.begin(...)`.
 
 **2) Can other radios see the packets I'm sending?**
 
