@@ -66,20 +66,21 @@ LoRaClass::LoRaClass(PinName mosi, PinName miso, PinName sck, PinName ss, PinNam
     _implicitHeaderMode(0),
     _onReceive(NULL)
 {
-    _spi.format(8, 0);
-    _spi.frequency(LORA_DEFAULT_SPI_FREQUENCY);
+    
 }
 
 int LoRaClass::begin(long frequency)
 {
+    _spi.format(8, 0);
+    _spi.frequency(LORA_DEFAULT_SPI_FREQUENCY);
     // set SS high
     _ss = 1;
 
     // perform reset
     _reset = 0;
-    wait_ms(10);
+    ThisThread::sleep_for(10);
     _reset = 1;
-    wait_ms(10);
+    ThisThread::sleep_for(10);
 
     // check version
     uint8_t version = readRegister(REG_VERSION);
